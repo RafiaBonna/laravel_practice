@@ -6,6 +6,6 @@
     <title>DocumentTest</title>
 </head>
 <body>
-    <h2>Hiii</h2>
+    <h2>Take a break</h2>
 </body>
 </html>
