@@ -1,0 +1,482 @@
+🚀 Laravel মাল্টি-রোল অথেন্টিকেশন সেটআপ (সম্পূর্ণ গাইড)
+
+এই গাইডটি একটি নতুন Laravel 12 প্রজেক্ট তৈরি থেকে শুরু করে, অ্যাডমিন (Admin) এবং ভেন্ডর (Vendor) এর জন্য আলাদা ড্যাশবোর্ড তৈরি পর্যন্ত প্রতিটি ছোট ধাপ নিয়ে আলোচনা করবে।
+
+ধাপ ১: প্রজেক্ট ইনিশিয়ালাইজেশন ও অথেন্টিকেশন সেটআপ (Project Setup)
+
+১.১. Laravel প্রজেক্ট তৈরি
+
+প্রথমে তোমার টার্মিনাল/কমান্ড প্রম্পট-এ নিচের কমান্ডটি চালিয়ে একটি নতুন Laravel প্রজেক্ট তৈরি করো:
+
+composer create-project laravel/laravel auth-one
+cd auth-one
+
+
+১.২. Laravel Breeze ইনস্টল
+
+Laravel Breeze হলো দ্রুত অথেন্টিকেশন স্ক্রাফোল্ডিং (Login, Registration ইত্যাদি) তৈরির জন্য সবচেয়ে সহজ উপায়।
+
+composer require laravel/breeze --dev
+php artisan breeze:install
+
+
+নোট: ইনস্টলেশনের সময় তোমাকে Frontend Stack (যেমন: Blade, React, Vue) এবং Test Framework (যেমন: Pest) নির্বাচন করতে বলবে। তুমি এখানে Blade এবং Pest নির্বাচন করতে পারো।
+
+১.৩. Frontend অ্যাসেট ইনস্টল ও বিল্ড
+
+Laravel এখন Vite ব্যবহার করে। Frontend CSS/JS ফাইলগুলোকে কম্পাইল করার জন্য Node.js নির্ভরতা ইনস্টল এবং বিল্ড করতে হবে।
+
+npm install
+npm run dev
+# অথবা, ফাইনাল বিল্ডের জন্য npm run build
+
+
+১.৪. ডাটাবেস সংযোগ সেটআপ
+
+তোমার .env ফাইলে ডাটাবেসের নাম, ইউজারনেম ও পাসওয়ার্ড ঠিক করে নাও।
+
+ধাপ ২: ডাটাবেস আপডেট ও সিডিং (Roles Preparation)
+
+২.১. ইউজার মডেল ও মাইগ্রেশন আপডেট
+
+ইউজারদের রোল সংরক্ষণের জন্য আমাদের users টেবিলে একটি role কলাম যোগ করতে হবে।
+
+যদি role কলাম যোগ করা না থাকে, তবে একটি নতুন মাইগ্রেশন তৈরি করো:
+
+php artisan make:migration add_role_and_status_to_users_table --table=users
+
+
+database/migrations/*_add_role_and_status_to_users_table.php ফাইলটি ওপেন করে up() মেথডটি আপডেট করো:
+
+// ...
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+Schema::table('users', function (Blueprint $table) {
+    // 'role' কলাম যোগ করা হলো, ডিফল্ট ভ্যালু 'customer' (বা ফাঁকা)
+    $table->string('role')->default('customer')->after('email'); 
+    // যদি status দরকার হয়, সেটিও যোগ করো
+    $table->string('status')->default('active')->after('role'); 
+});
+// ...
+
+
+২.২. মাইগ্রেশন রান করা ও সিডার তৈরি
+
+মাইগ্রেশন রান করে ডাটাবেসে নতুন কলাম তৈরি করো:
+
+php artisan migrate
+
+
+টেস্ট করার জন্য অ্যাডমিন এবং ভেন্ডর ইউজার তৈরি করতে একটি Seeder ফাইল তৈরি ও আপডেট করো:
+
+php artisan make:seeder RoleUserSeeder
+
+
+database/seeders/RoleUserSeeder.php ফাইলটি আপডেট করো:
+এখানে তুমি Test User-এর বদলে Admin এবং Vendor ইউজার তৈরি করে নাও।
+
+// database/seeders/RoleUserSeeder.php
+// ...
+use App\Models\User;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
+
+class RoleUserSeeder extends Seeder
+{
+    public function run(): void
+    {
+        // Admin ইউজার
+        User::updateOrCreate(
+            ['email' => 'admin@example.com'],
+            [
+                'name' => 'Admin User',
+                'password' => Hash::make('password'), // একটি সাধারণ পাসওয়ার্ড ব্যবহার করা হলো
+                'role' => 'admin',
+                'status' => 'active',
+            ]
+        );
+
+        // Vendor ইউজার
+        User::updateOrCreate(
+            ['email' => 'vendor@example.com'],
+            [
+                'name' => 'Vendor User',
+                'password' => Hash::make('password'), 
+                'role' => 'vendor',
+                'status' => 'active',
+            ]
+        );
+        
+        // Customer ইউজার
+        User::updateOrCreate(
+            ['email' => 'customer@example.com'],
+            [
+                'name' => 'Customer User',
+                'password' => Hash::make('password'), 
+                'role' => 'customer',
+                'status' => 'active',
+            ]
+        );
+    }
+}
+
+
+সিডার রান করো:
+
+php artisan db:seed --class=RoleUserSeeder
+
+
+(যদি তুমি db:seed চালানোর সময় Duplicate entry Error পাও, তবে হয় ডাটাবেস ফ্লাশ করে আবার মাইগ্রেট ও সিড করো, অথবা User::updateOrCreate ব্যবহার করো, যেমনটি উপরে দেখানো হয়েছে।)
+
+ধাপ ৩: মিডলওয়্যার ইমপ্লিমেন্টেশন (The Gatekeeper)
+
+৩.১. RoleMiddleware তৈরি
+
+এই মিডলওয়্যারটি চেক করবে যে ইউজারের রাউট অ্যাক্সেস করার অনুমতি আছে কিনা।
+
+php artisan make:middleware RoleMiddleware
+
+
+app/Http/Middleware/RoleMiddleware.php ফাইলটি আপডেট করো:
+
+// app/Http/Middleware/RoleMiddleware.php
+<?php
+
+namespace App\Http\Middleware;
+
+use Closure;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpFoundation\Response;
+
+class RoleMiddleware
+{
+    /**
+     * রাউটে চাওয়া রোলের সাথে ইউজারের রোল মিলছে কিনা তা হ্যান্ডেল করে।
+     * * @param string $role রাউটে ডিফাইন করা রোল (যেমন: 'admin', 'vendor')
+     */
+    public function handle(Request $request, Closure $next, string $role): Response
+    {
+        // ১. যদি ইউজার লগইন করা না থাকে
+        if (!Auth::check()) {
+            return redirect('/login');
+        }
+
+        $user = Auth::user();
+        
+        // ২. যদি লগইন করা ইউজারের রোল, রাউটে চাওয়া রোলের সাথে না মেলে
+        if ($user->role !== $role) {
+            // তুমি চাইলে এখানে একটি 403 Forbidden পেজ দেখাতে পারো 
+            // অথবা তাকে তার নিজস্ব ড্যাশবোর্ডে রিডাইরেক্ট করতে পারো।
+            return redirect('/dashboard')->with('error', 'আপনার এই পেজটি দেখার অনুমতি নেই।'); 
+        }
+
+        // ৩. রোল মিলে গেলে, রিকোয়েস্ট পাস করে দাও
+        return $next($request);
+    }
+}
+
+
+৩.২. মিডলওয়্যার Alias রেজিস্টার
+
+Laravel-কে বোঝাতে হবে যে রাউটে যখন আমরা role:admin ব্যবহার করছি, তখন আসলে কোন ক্লাসকে কল করতে হবে।
+
+bootstrap/app.php ফাইলটি ওপেন করে withMiddleware ফাংশনের মধ্যে alias ব্লক যোগ করো:
+
+// bootstrap/app.php
+// ...
+    ->withMiddleware(function (Middleware $middleware): void {
+        // ✅ এইখানে তোমার RoleMiddleware টি Alias হিসেবে রেজিস্টার করা হলো
+        $middleware->alias([
+            'role' => \App\Http\Middleware\RoleMiddleware::class, // 'role' Alias টি এখন Routes এ ব্যবহার করা যাবে
+        ]);
+        
+        // ... অন্যান্য middleware 
+    })
+// ...
+
+
+ধাপ ৪: কন্ট্রোলার তৈরি ও লজিক (The Brains)
+
+আমরা তিনটি কন্ট্রোলার তৈরি করব: Admin, Vendor-এর ড্যাশবোর্ড এবং লগইন-এর পরে রিডাইরেক্ট করার জন্য একটি কন্ট্রোলার।
+
+৪.১. ড্যাশবোর্ড কন্ট্রোলার তৈরি
+
+Admin এবং Vendor-এর জন্য আলাদা ফোল্ডারে কন্ট্রোলার তৈরি করো (Laravel নিজেই ফোল্ডার তৈরি করে নেবে)।
+
+php artisan make:controller Admin/AdminDashboardController
+php artisan make:controller Vendor/VendorDashboardController
+php artisan make:controller RoleRedirectController
+
+
+৪.২. ড্যাশবোর্ড কন্ট্রোলার কোড আপডেট
+
+app/Http/Controllers/Admin/AdminDashboardController.php:
+
+<?php
+namespace App\Http\Controllers\Admin; // ✅ সঠিক Namespace
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+
+class AdminDashboardController extends Controller
+{
+    public function index()
+    {
+        // Admin-এর ড্যাশবোর্ড view লোড করা হলো
+        return view('admin.dashboard'); 
+    }
+}
+
+
+app/Http/Controllers/Vendor/VendorDashboardController.php:
+
+<?php
+namespace App\Http\Controllers\Vendor; // ✅ সঠিক Namespace
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+
+class VendorDashboardController extends Controller
+{
+    public function index()
+    {
+        // Vendor-এর ড্যাশবোর্ড view লোড করা হলো
+        return view('vendor.dashboard'); 
+    }
+}
+
+
+৪.৩. RoleRedirectController কোড আপডেট
+
+app/Http/Controllers/RoleRedirectController.php:
+
+<?php
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
+class RoleRedirectController extends Controller
+{
+    public function index()
+    {
+        $role = Auth::user()->role;
+
+        switch ($role) {
+            case 'admin':
+                return redirect()->route('admin.dashboard'); // Admin এর রুট
+            case 'vendor':
+                return redirect()->route('vendor.dashboard'); // Vendor এর রুট
+            case 'customer':
+            case 'rider':
+            default:
+                // Customer/Rider বা অন্য রোলের জন্য ডিফল্ট রুট
+                return redirect()->route('user.dashboard'); 
+        }
+    }
+}
+
+
+ধাপ ৫: রাউটিং কনফিগারেশন (The Paths)
+
+৫.১. রোলের জন্য আলাদা রাউট ফাইল তৈরি
+
+তোমার routes ফোল্ডারে দুটি নতুন ফাইল তৈরি করো:
+
+routes/admin.php
+
+routes/vendor.php
+
+routes/admin.php:
+
+<?php
+
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\AdminDashboardController; // ✅ সঠিক Controller Import
+
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
+    // Admin ড্যাশবোর্ডের মূল রুট
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
+    // ... Admin-এর অন্যান্য রুট
+});
+
+
+routes/vendor.php:
+
+<?php
+
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Vendor\VendorDashboardController; // ✅ সঠিক Controller Import
+
+Route::middleware(['auth', 'role:vendor'])->prefix('vendor')->group(function () {
+    // Vendor ড্যাশবোর্ডের মূল রুট
+    Route::get('/dashboard', [VendorDashboardController::class, 'index'])->name('vendor.dashboard');
+    // ... Vendor-এর অন্যান্য রুট
+});
+
+
+৫.২. routes/web.php আপডেট
+
+এই ফাইলে নতুন কন্ট্রোলার এবং রোলের রাউট ফাইলগুলোকে লোড করতে হবে।
+
+routes/web.php ফাইলটি সম্পূর্ণ কোড দিয়ে আপডেট করো:
+
+// routes/web.php
+<?php
+
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RoleRedirectController; // ✅ এটি যোগ করতে হবে
+use Illuminate\Support\Facades\Route;
+
+/*
+|--------------------------------------------------------------------------
+| Public Routes
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/', function () {
+    return view('welcome');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Multi-Role Redirect
+|--------------------------------------------------------------------------
+| এই রুটটি লগইন করার পর ইউজারকে তার role অনুযায়ী সঠিক ড্যাশবোর্ডে রিডাইরেক্ট করবে।
+*/
+// (১) /dashboard route টি এখন RoleRedirectController কে কল করবে।
+Route::get('/dashboard', [RoleRedirectController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard'); // ✅ এই name টি login এর পর ডিফল্ট redirect হিসেবে ব্যবহৃত হবে
+
+/*
+|--------------------------------------------------------------------------
+| General User Dashboard (Customer/Rider/Default)
+|--------------------------------------------------------------------------
+| RoleRedirectController থেকে এই রুটে redirect হবে যখন role 'admin' বা 'vendor' না হবে।
+*/
+// (২) ডিফল্ট ইউজারদের জন্য একটি নতুন route, যা অরিজিনাল dashboard view দেখাবে।
+Route::get('/general/dashboard', function () {
+    return view('dashboard'); // resources/views/dashboard.blade.php ফাইলটি লোড হবে
+})->middleware(['auth', 'verified'])->name('user.dashboard');
+
+/*
+|--------------------------------------------------------------------------
+| Authenticated User Routes (Profile)
+|--------------------------------------------------------------------------
+*/
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Role Specific Routes Require
+|--------------------------------------------------------------------------
+*/
+require __DIR__ . '/auth.php';
+require __DIR__ . '/admin.php'; // ✅ Admin routes লোড করা হলো
+require __DIR__ . '/vendor.php'; // ✅ Vendor routes লোড করা হলো
+
+
+
+ধাপ ৬: ভিউ ফাইল তৈরি (The Views)
+
+Laravel-কে ড্যাশবোর্ড দেখাতে হলে ভিউ ফাইলগুলো তৈরি থাকতে হবে।
+
+resources/views/ ফোল্ডারের ভেতরে ফোল্ডার ও ফাইল তৈরি করো:
+
+resources/views/admin/dashboard.blade.php (নতুন ফোল্ডার ও ফাইল)
+
+resources/views/vendor/dashboard.blade.php (নতুন ফোল্ডার ও ফাইল)
+
+resources/views/dashboard.blade.php (এটি Customer/Rider এর জন্য ব্যবহৃত হবে, Breeze এটি তৈরি করে দেয়)
+
+admin/dashboard.blade.php:
+
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            {{ __('Admin Dashboard') }}
+        </h2>
+    </x-slot>
+
+    <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900">
+                    {{ __("আপনি একজন অ্যাডমিন হিসেবে লগইন করেছেন!") }}
+                </div>
+            </div>
+        </div>
+    </div>
+</x-app-layout>
+
+
+vendor/dashboard.blade.php:
+
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            {{ __('Vendor Dashboard') }}
+        </h2>
+    </x-slot>
+
+    <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900">
+                    {{ __("আপনি একজন ভেন্ডর হিসেবে লগইন করেছেন!") }}
+                </div>
+            </div>
+        </div>
+    </div>
+</x-app-layout>
+
+
+ধাপ ৭: ফাইনাল রান
+
+সব ফাইল ঠিকঠাক আপডেট করার পর, সার্ভারটি চালু করো:
+
+php artisan serve
+
+
+এখন তুমি এই ইউজার ডিটেইলস দিয়ে লগইন করে দেখতে পারো যে রোল অনুযায়ী ড্যাশবোর্ড পরিবর্তন হচ্ছে কিনা:
+
+ইউজার
+
+ইমেইল
+
+পাসওয়ার্ড
+
+প্রত্যাশিত ফলাফল
+
+Admin
+
+admin@example.com
+
+password
+
+Admin Dashboard দেখাবে
+
+Vendor
+
+vendor@example.com
+
+password
+
+Vendor Dashboard দেখাবে
+
+Customer
+
+customer@example.com
+
+password
+
+Default Dashboard দেখাবে
+
+এই গাইডটি অনুসরণ করলে তুমি একদম শুরু থেকে তোমার মাল্টি-রোল সিস্টেম তৈরি করে ফেলতে পারবে!
