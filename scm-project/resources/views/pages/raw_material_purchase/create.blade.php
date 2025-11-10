@@ -9,6 +9,7 @@
     <table>
         <th>ID</th>
         <th>Name</th>
+        <th>Supplier Name</th>
     </table>
 </body>
 </html>
