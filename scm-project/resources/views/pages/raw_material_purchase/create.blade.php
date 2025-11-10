@@ -9,7 +9,9 @@
     <table>
         <th>ID</th>
         <th>Name</th>
-        <th>Supplier Name</th>
+         <th>Supplier Name</th>
+        <th>QTY</th>
+       
     </table>
 </body>
 </html>
