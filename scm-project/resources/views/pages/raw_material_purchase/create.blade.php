@@ -12,6 +12,7 @@
          <th>Supplier Name</th>
         <th>QTY</th>
         <th>Units</th>
+        <th>Price</th>
        
     </table>
 </body>
