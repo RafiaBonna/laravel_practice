@@ -11,6 +11,7 @@
         <th>Name</th>
          <th>Supplier Name</th>
         <th>QTY</th>
+        <th>Units</th>
        
     </table>
 </body>
