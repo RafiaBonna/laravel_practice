@@ -8,6 +8,7 @@
 <body>
     <table>
         <th>ID</th>
+        <th>Name</th>
     </table>
 </body>
 </html>
