@@ -6,6 +6,8 @@
     <title>Document</title>
 </head>
 <body>
-    
+    <table>
+        <th>ID</th>
+    </table>
 </body>
 </html>
