@@ -58,7 +58,6 @@
                     <th>Existing Material</th>
                     <th>New Material Name</th>
                     <th>Unit</th>
-                    <th>Batch</th>
                     <th>Qty</th>
                     <th>Unit Price</th>
                     <th>Total</th>
