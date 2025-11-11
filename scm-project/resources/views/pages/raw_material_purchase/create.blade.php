@@ -1,4 +1,4 @@
-@extends('master')
+
 
 
 <div class="container mt-4">
