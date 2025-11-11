@@ -143,6 +143,6 @@
             </div>
         </div>
 
-        <button type="submit" class="btn btn-primary">Save Purchase</button>
+        <button type="submit" class="btn btn-primary">Save Purchases</button>
     </form>
 </div>
