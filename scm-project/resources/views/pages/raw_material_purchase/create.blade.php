@@ -1,6 +1,6 @@
 @extends('master')
 
-@section('content')
+
 <div class="container mt-4">
     <h4>Add Raw Material Purchase</h4>
 
