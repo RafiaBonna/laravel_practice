@@ -39,7 +39,7 @@
                     <table class="table table-striped table-valign-middle">
                         <thead>
                             <tr>
-                                <th>#</th>
+                                <th>ID</th>
                                 <th>Name</th>
                                 <th>Contact Person</th>
                                 <th>Phone/Email</th>
