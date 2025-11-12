@@ -42,7 +42,7 @@
                                 <th>ID</th>
                                 <th>Name</th>
                                 <th>Contact</th>
-                                <th>Phone/Email</th>
+                                <th>Phone or Email</th>
                                 <th>Address</th>
                                 <th>Status</th>
                                 <th style="width: 150px;">Actions</th>
