@@ -41,7 +41,7 @@
                             <tr>
                                 <th>ID</th>
                                 <th>Name</th>
-                                <th>Contact Person</th>
+                                <th>Contact</th>
                                 <th>Phone/Email</th>
                                 <th>Address</th>
                                 <th>Status</th>
