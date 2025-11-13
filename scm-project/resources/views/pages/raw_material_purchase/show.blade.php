@@ -7,7 +7,7 @@
             <h6 class="m-0 font-weight-bold text-primary">Purchase Invoice: {{ $invoice->invoice_number }}</h6>
             <div>
                 <a href="{{ route('superadmin.raw-material-purchases.index') }}" class="btn btn-secondary btn-sm">
-                    <i class="fas fa-arrow-left"></i> Back to List
+                    <i class="fas fa-arrow-right"></i> Back to List
                 </a>
                 <button onclick="window.print()" class="btn btn-primary btn-sm">
                     <i class="fas fa-print"></i> Print
