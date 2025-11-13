@@ -15,8 +15,7 @@
             </div>
         </div>
         <div class="card-body p-5" id="invoice-body">
-            
-            {{-- INVOICE HEADER: Company/Title (Updated Name) --}}
+          
             <div class="text-center mb-5">
                 <h1 class="font-weight-bold text-dark mb-1">OPTICHAIN SOLUTIONS</h1>
                 <p class="text-muted">RAW MATERIAL PURCHASE INVOICE</p>
