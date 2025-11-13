@@ -18,7 +18,7 @@
           
             <div class="text-center mb-5">
                 <h1 class="font-weight-bold text-dark mb-1">OPTICHAIN SOLUTIONS</h1>
-                <p class="text-muted">MATERIAL PURCHASE INVOICE</p>
+                <p class="text-muted">PURCHASE INVOICE</p>
                 <hr style="border-top: 3px solid #343a40;"> {{-- Dark line for separation --}}
             </div>
 
