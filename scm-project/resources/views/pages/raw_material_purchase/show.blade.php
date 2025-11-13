@@ -109,8 +109,7 @@
     </div>
 </div>
 
-{{-- Printing CSS (Optional: Print করার সময় অপ্রয়োজনীয় অংশ লুকিয়ে রাখে) --}}
-@push('styles')
+
 <style>
     @media print {
         /* Hide unnecessary elements during print */
