@@ -137,12 +137,4 @@
                 <label>Grand Total</label>
                 {{-- FIX: Set initial value of grand total from old() --}}
                 <input type="number" name="grand_total" id="grand_total" class="form-control" step="0.01" readonly value="{{ old('grand_total') }}">
-                @error('grand_total') <small class="text-danger">{{ $message }}</small> @enderror
-                
-                <input type="hidden" name="calculated_total" id="calculated_total" value="{{ old('calculated_total') }}">
-            </div>
-        </div>
-
-        <button type="submit" class="btn btn-primary">Save Purchases</button>
-    </form>
-</div>
+          
