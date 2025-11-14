@@ -83,23 +83,3 @@
                                 >
                                     {{ $m->name }} ({{ $m->unit_of_measure }})
                                 </option>
-                            @endforeach
-                        </select>
-                        @error("items.$index.raw_material_id") <small class="text-danger">{{ $message }}</small> @enderror
-                    </td>
-                    <td>
-                        <input type="text" name="items[{{ $index }}][new_material_name]" class="form-control" placeholder="If new" value="{{ old("items.$index.new_material_name") }}">
-                        @error("items.$index.new_material_name") <small class="text-danger">{{ $message }}</small> @enderror
-                    </td>
-                    <td>
-                        <input type="text" name="items[{{ $index }}][unit_of_measure]" class="form-control item-unit" placeholder="KG/Litre" value="{{ old("items.$index.unit_of_measure") }}">
-                        @error("items.$index.unit_of_measure") <small class="text-danger">{{ $message }}</small> @enderror
-                    </td>
-                    <td>
-                        <input type="text" name="items[{{ $index }}][batch_number]" class="form-control" value="{{ old("items.$index.batch_number") }}">
-                        @error("items.$index.batch_number") <small class="text-danger">{{ $message }}</small> @enderror
-                    </td>
-                    <td>
-                        <input type="number" name="items[{{ $index }}][quantity]" class="form-control qty" step="0.01" value="{{ old("items.$index.quantity") }}">
-                        @error("items.$index.quantity") <small class="text-danger">{{ $message }}</small> @enderror
-
