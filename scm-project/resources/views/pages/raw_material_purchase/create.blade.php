@@ -102,39 +102,4 @@
                     <td>
                         <input type="number" name="items[{{ $index }}][quantity]" class="form-control qty" step="0.01" value="{{ old("items.$index.quantity") }}">
                         @error("items.$index.quantity") <small class="text-danger">{{ $message }}</small> @enderror
-                    </td>
-                    <td>
-                        <input type="number" name="items[{{ $index }}][unit_price]" class="form-control price" step="0.01" value="{{ old("items.$index.unit_price") }}">
-                        @error("items.$index.unit_price") <small class="text-danger">{{ $message }}</small> @enderror
-                    </td>
-                    <td>
-                        <input type="number" name="items[{{ $index }}][total_price]" class="form-control total" readonly value="{{ old("items.$index.total_price") }}">
-                        @error("items.$index.total_price") <small class="text-danger">{{ $message }}</small> @enderror
-                    </td>
-                    <td><button type="button" class="btn btn-danger btn-sm removeRow">X</button></td>
-                </tr>
-                @php $rowIndex++; @endphp
-                @endforeach
-            </tbody>
-        </table>
 
-        <button type="button" id="addRow" class="btn btn-secondary mb-3">+ Add Item</button>
-
-        {{-- SUMMARY AND NOTES --}}
-        <div class="row mb-3">
-            {{-- FIX: Added missing Notes field --}}
-            <div class="col-md-7">
-                <label>Notes</label>
-                <textarea name="notes" class="form-control" rows="3">{{ old('notes') }}</textarea>
-                @error('notes') <small class="text-danger">{{ $message }}</small> @enderror
-            </div>
-            
-            <div class="col-md-4 ms-auto">
-                <label>Discount</label>
-                <input type="number" name="discount_amount" id="discount_amount" class="form-control" step="0.01" value="{{ old('discount_amount', 0) }}">
-                @error('discount_amount') <small class="text-danger">{{ $message }}</small> @enderror
-                
-                <label>Grand Total</label>
-                {{-- FIX: Set initial value of grand total from old() --}}
-                <input type="number" name="grand_total" id="grand_total" class="form-control" step="0.01" readonly value="{{ old('grand_total') }}">
-          
