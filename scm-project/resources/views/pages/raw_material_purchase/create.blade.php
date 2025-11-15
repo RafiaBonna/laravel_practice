@@ -13,5 +13,5 @@
     @endif
     
     {{-- Display ALL validation errors at the top for visibility --}}
-_date" class="form-control" required value="{{ old('invoice_date', date('Y-m-d')) }}">
+a_date" class="form-control" required value="{{ old('invoice_date', date('Y-m-d')) }}">
 
