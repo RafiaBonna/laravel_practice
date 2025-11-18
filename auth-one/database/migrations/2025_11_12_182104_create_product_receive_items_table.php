@@ -1,7 +1,5 @@
 <?php
 
-// database/migrations/YYYY_MM_DD_HHMMSS_create_product_receive_items_table.php
-
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -12,16 +10,25 @@ return new class extends Migration
     {
         Schema::create('product_receive_items', function (Blueprint $table) {
             $table->id();
-            // product_receives টেবিলের সাথে সম্পর্ক
+
+            // Foreign keys
             $table->foreignId('product_receive_id')->constrained('product_receives')->onDelete('cascade'); 
-            // products টেবিলের সাথে সম্পর্ক
             $table->foreignId('product_id')->constrained('products'); 
-            
-            $table->string('batch_no')->nullable(); // উৎপাদনের ব্যাচ নম্বর
+
+            // Product info
+            $table->string('batch_no')->nullable();
             $table->date('production_date')->nullable();
             $table->date('expiry_date')->nullable();
             $table->decimal('received_quantity', 15, 2);
-            $table->decimal('cost_rate', 15, 2)->nullable(); // উৎপাদন খরচ (ঐচ্ছিক)
+
+            // Pricing & cost
+            $table->decimal('cost_rate', 15, 2)->default(0);
+            $table->decimal('mrp', 15, 2)->default(0);
+            $table->decimal('retail', 15, 2)->default(0);
+            $table->decimal('distributor', 15, 2)->default(0);
+            $table->decimal('depo_selling', 15, 2)->default(0);
+            $table->decimal('total_item_cost', 18, 2)->default(0);
+
             $table->timestamps();
         });
     }

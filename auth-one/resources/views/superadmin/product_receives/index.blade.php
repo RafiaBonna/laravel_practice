@@ -13,14 +13,15 @@
 
     <div class="card">
         <div class="card-body">
-            <table class="table table-bordered table-sm">
+            <table class="table table-bordered table-striped table-sm">
                 <thead>
                     <tr>
                         <th>Receive No</th>
-                        <th>Receive Date</th>
+                        <th>Date</th>
                         <th>Receiver</th>
+                        <th>Received By</th>
                         <th>Total Qty</th>
-                        <th>Note</th>
+                        <th>Total Cost</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -30,17 +31,17 @@
                             <td>{{ $receive->receive_no }}</td>
                             <td>{{ $receive->receive_date }}</td>
                             <td>{{ $receive->receiver->name ?? 'N/A' }}</td>
-                            <td>{{ $receive->items->sum('qty') }}</td>
-                            <td>{{ $receive->note }}</td>
+                            <td>{{ $receive->receivedBy->name ?? 'N/A' }}</td>
+                            <td>{{ $receive->total_received_qty }}</td>
+                            <td>{{ number_format($receive->total_cost ?? 0, 2) }}</td>
                             <td>
-                                <a href="{{ route('superadmin.product-receives.edit', $receive->id) }}" class="btn btn-sm btn-warning">Edit</a>
+                                <a href="{{ route('superadmin.product-receives.show', $receive->id) }}" class="btn btn-sm btn-info">View</a>
                             </td>
                         </tr>
                     @endforeach
                 </tbody>
             </table>
-
-            {{ $productReceives->links() }}
+            <div class="mt-2">{{ $productReceives->links() }}</div>
         </div>
     </div>
 </div>

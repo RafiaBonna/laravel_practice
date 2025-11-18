@@ -14,11 +14,19 @@ class ProductReceive extends Model
         'receive_date',
         'note',
         'total_received_qty',
+        'receiver_id',
+        'total_cost',
         'received_by_user_id',
     ];
 
-    // Relation with User (receiver)
+    // The user who is recorded as the receiver
     public function receiver()
+    {
+        return $this->belongsTo(User::class, 'receiver_id');
+    }
+
+    // The user who actually entered the receive in the system
+    public function receivedBy()
     {
         return $this->belongsTo(User::class, 'received_by_user_id');
     }
@@ -28,4 +36,8 @@ class ProductReceive extends Model
     {
         return $this->hasMany(ProductReceiveItem::class);
     }
+    public function user()
+{
+    return $this->belongsTo(User::class, 'received_by_user_id');
+}
 }
