@@ -1,320 +1,171 @@
 @extends('master')
 
-@section('title', 'Create New Sales Invoice')
-
 @section('content')
 <div class="container-fluid">
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">New Sales Invoice (For Depo)</h3>
-                </div>
-                {{-- অ্যাকশন URLটি এখন superadmin/sales এ পয়েন্ট করবে --}}
-                <form action="{{ route('superadmin.sales.store') }}" method="POST">
-                    @csrf
-                    <div class="card-body">
-
-                        {{-- Success/Error Messages --}}
-                        @if(session('success'))
-                            <div class="alert alert-success">{{ session('success') }}</div>
-                        @elseif(session('error'))
-                            <div class="alert alert-danger">{{ session('error') }}</div>
-                        @endif
-                        
-                        {{-- Validation Errors --}}
-                        @if ($errors->any())
-                            <div class="alert alert-danger">
-                                <ul>
-                                    @foreach ($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                            </div>
-                        @endif
-                        
-                        {{-- Invoice Header Info --}}
-                        <div class="form-group row">
-                            <label for="depo_id" class="col-md-2 col-form-label">Select Depo <span class="text-danger">*</span></label>
-                            <div class="col-md-4">
-                                <select name="depo_id" id="depo_id" class="form-control" required>
-                                    <option value="">Select a Depo</option>
-                                    @foreach($depos as $depo)
-                                        <option value="{{ $depo->id }}" {{ old('depo_id') == $depo->id ? 'selected' : '' }}>{{ $depo->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            
-                            <label for="invoice_date" class="col-md-2 col-form-label">Invoice Date <span class="text-danger">*</span></label>
-                            <div class="col-md-4">
-                                <input type="date" name="invoice_date" id="invoice_date" class="form-control" value="{{ old('invoice_date', date('Y-m-d')) }}" required>
-                            </div>
-                        </div>
-
-                        <hr>
-                        
-                        {{-- Product Item Table --}}
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-striped" id="product_table">
-                                <thead>
-                                    <tr>
-                                        <th style="width: 25%">Product <span class="text-danger">*</span></th>
-                                        <th style="width: 20%">Batch/Stock ID <span class="text-danger">*</span></th>
-                                        <th style="width: 10%">Available Stock</th>
-                                        <th style="width: 10%">Quantity <span class="text-danger">*</span></th>
-                                        <th style="width: 15%">Unit Price <span class="text-danger">*</span></th>
-                                        <th style="width: 15%">Sub Total</th>
-                                        <th style="width: 5%">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {{-- Initial Row (row index 0) --}}
-                                    <tr>
-                                        <td>
-                                            <select name="items[0][product_id]" class="form-control product-select" required>
-                                                <option value="">Select Product</option>
-                                                @foreach($products as $product)
-                                                    <option value="{{ $product->id }}">{{ $product->name }}</option>
-                                                @endforeach
-                                            </select>
-                                        </td>
-                                        <td>
-                                            <select name="items[0][product_stock_id]" class="form-control batch-select" required disabled>
-                                                <option value="">Select Product First</option>
-                                            </select>
-                                        </td>
-                                        <td>
-                                            {{-- NOTE: name attribute removed to avoid confusion with form submission, readonly added --}}
-                                            <input type="text" class="form-control stock-available" readonly value="0"> 
-                                        </td>
-                                        <td>
-                                            <input type="number" name="items[0][quantity]" class="form-control quantity-input" min="1" required disabled value="1">
-                                        </td>
-                                        <td>
-                                            <input type="number" name="items[0][unit_price]" class="form-control price-input" step="0.01" min="0" required value="0.00">
-                                        </td>
-                                        <td>
-                                            <input type="text" name="items[0][sub_total]" class="form-control sub-total" readonly value="0.00">
-                                        </td>
-                                        <td>
-                                            <button type="button" class="btn btn-danger btn-sm remove-row" disabled><i class="fas fa-trash"></i></button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                                <tfoot>
-                                    <tr>
-                                        <td colspan="5" class="text-right font-weight-bold">Grand Total:</td>
-                                        <td>
-                                            <input type="text" id="grand_total" class="form-control" readonly value="0.00">
-                                        </td>
-                                        <td>
-                                            <button type="button" id="add-row" class="btn btn-success btn-sm"><i class="fas fa-plus"></i> Add</button>
-                                        </td>
-                                    </tr>
-                                </tfoot>
-                            </table>
-                        </div>
-
-                    </div>
-                    
-                    <div class="card-footer">
-                        <button type="submit" class="btn btn-primary">Create Invoice & Send for Approval</button>
-                    </div>
-                </form>
-            </div>
+    <div class="card card-primary">
+        <div class="card-header">
+            <h3 class="card-title">➕ New Sales Invoice</h3>
         </div>
+
+        <form action="{{ route('superadmin.sales.store') }}" method="POST">
+            @csrf
+            <div class="card-body">
+
+                @if ($errors->any())
+                    <div class="alert alert-danger">
+                        <ul class="mb-0">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
+                {{-- Invoice Basic Info --}}
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label>Invoice No <span class="text-danger">*</span></label>
+                        <input type="text" name="invoice_no" class="form-control" 
+                               value="{{ old('invoice_no', $invoice_no) }}" readonly required>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label>Invoice Date <span class="text-danger">*</span></label>
+                        <input type="date" name="invoice_date" class="form-control" 
+                               value="{{ old('invoice_date', date('Y-m-d')) }}" required>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label>Select Depo <span class="text-danger">*</span></label>
+                        <select name="depo_id" class="form-select" required>
+                            <option value="">-- Select Depo --</option>
+                            @foreach ($depos as $depo)
+                                <option value="{{ $depo->id }}" {{ old('depo_id') == $depo->id ? 'selected' : '' }}>
+                                    {{ $depo->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+
+                {{-- Product Items Table --}}
+                <div class="card border-info">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="card-title mb-0">Product Items</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <table class="table table-striped table-hover table-sm mb-0">
+                            <thead>
+                                <tr class="bg-light">
+                                    <th style="width: 40%">Product <span class="text-danger">*</span></th>
+                                    <th style="width: 15%">Quantity <span class="text-danger">*</span></th>
+                                    <th style="width: 20%">Unit Price <span class="text-danger">*</span></th>
+                                    <th style="width: 15%">Subtotal</th>
+                                    <th style="width: 10%">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="item-table-body">
+                                {{-- JS dynamic rows --}}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="3" class="text-end fw-bold">Grand Total</td>
+                                    <td class="text-center fw-bold">
+                                        <input type="text" id="grand_total" class="form-control form-control-sm text-center fw-bold" value="0.00" readonly>
+                                    </td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="5" class="text-end">
+                                        <button type="button" class="btn btn-sm btn-success" id="add-item-row">
+                                            <i class="fas fa-plus"></i> Add Product
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="mt-3 text-end">
+                    <button type="submit" class="btn btn-primary btn-lg">Save Invoice</button>
+                </div>
+            </div>
+        </form>
     </div>
 </div>
+
+{{-- Hidden Row Template --}}
+<table class="d-none">
+    <tr id="item-row-template">
+        <td>
+            <select name="items[__INDEX__][product_id]" class="form-select form-select-sm product-select" required>
+                <option value="">-- Select Product --</option>
+                @foreach ($products as $product)
+                    <option value="{{ $product->id }}">{{ $product->name }}</option>
+                @endforeach
+            </select>
+        </td>
+        <td><input type="number" name="items[__INDEX__][quantity]" class="form-control form-control-sm quantity text-center" min="1" value="1" required></td>
+        <td><input type="number" name="items[__INDEX__][unit_price]" class="form-control form-control-sm unit-price text-end" min="0" step="0.01" value="0.00" required></td>
+        <td class="text-center fw-bold subtotal-text">0.00</td>
+        <td><button type="button" class="btn btn-sm btn-danger remove-row"><i class="fas fa-trash"></i></button></td>
+    </tr>
+</table>
+
 @endsection
 
-@push('scripts')
+@section('scripts')
 <script>
-// ✅ FIX: নিশ্চিত করা হলো যে jQuery এবং DOM পুরোপুরি লোড হওয়ার পরই কোড রান করবে
-$(function() { 
-    
-    let row_count = 1;
+let itemIndex = 0;
 
-    // ----------------------------------------------------
-    // Core Logic: Load Batches and Auto-fill Stock/Price
-    // ----------------------------------------------------
-    
-    function loadProductBatches(row) {
-        let productId = row.find('.product-select').val();
-        let batchSelect = row.find('.batch-select');
-        let stockInput = row.find('.stock-available');
-        let priceInput = row.find('.price-input');
-        let qtyInput = row.find('.quantity-input');
-        
-        // Reset fields
-        stockInput.val(0);
-        priceInput.val(0.00);
-        row.find('.sub-total').val(0.00);
-        qtyInput.prop('disabled', true).val(1); 
-        
-        batchSelect.prop('disabled', true).html('<option value="">Loading Batches...</option>');
+$(document).ready(function() {
+    addItemRow();
 
-        if (productId) {
-            // ✅ FIX: সরাসরি URL Path ব্যবহার করা হলো
-            let url = `/superadmin/sales/api/product-stock/batches/${productId}`;
-            
-            console.log(`[DEBUG URL] Requesting: ${url}`);
-            
+    $('#add-item-row').on('click', function() {
+        addItemRow();
+    });
 
-            $.get(url, function(batches) {
-                console.log("[DEBUG SUCCESS] Batches received:", batches);
+    $('#item-table-body').on('input', '.quantity, .unit-price', function() {
+        let row = $(this).closest('tr');
+        updateRowSubtotal(row);
+        updateGrandTotal();
+    });
 
-                batchSelect.html('<option value="">Select Batch</option>');
-                
-                if (batches.length > 0) {
-                    
-                    // 1. Dropdown অপশন দিয়ে ফিল করা
-                    batches.forEach(function(batch) {
-                        batchSelect.append(`<option 
-                            value="${batch.id}" 
-                            data-available-stock="${batch.available_quantity}"
-                            data-unit-price="${batch.unit_price}"
-                        >Batch: ${batch.batch_no} (Stock: ${batch.available_quantity})</option>`);
-                    });
-
-                    // 2. প্রথম ব্যাচটির ডেটা সরাসরি নেওয়া
-                    const firstBatch = batches[0];
-                    const availableStock = firstBatch.available_quantity;
-                    const unitPrice = firstBatch.unit_price;
-
-                    // 3. ফিল্ডগুলো অটো-ফিল করা
-                    batchSelect.val(firstBatch.id); // প্রথম ব্যাচ সিলেক্ট করা হলো
-                    stockInput.val(availableStock);
-                    priceInput.val(unitPrice.toFixed(2));
-                    
-                    // 4. Quantity ফিল্ড এনাবল করা
-                    qtyInput.prop('disabled', false).val(1);
-                    batchSelect.prop('disabled', false);
-
-                    // Calculation (যদি Quantity 1 থাকে)
-                    const subTotal = 1 * unitPrice;
-                    row.find('.sub-total').val(subTotal.toFixed(2));
-                    
-                } else {
-                    batchSelect.html('<option value="">No Stock Available</option>');
-                }
-                
-                updateTotal(); // গ্র্যান্ড টোটাল আপডেট
-                
-            }).fail(function(xhr) {
-                console.error("[DEBUG FAIL] Failed to load batches. Status:", xhr.status, "Response:", xhr.responseText);
-                batchSelect.html('<option value="">Failed to load batches</option>');
-                updateTotal();
-            });
+    $('#item-table-body').on('click', '.remove-row', function() {
+        if ($('#item-table-body tr').length > 1) {
+            $(this).closest('tr').remove();
+            updateGrandTotal();
         } else {
-            batchSelect.prop('disabled', true).html('<option value="">Select Product First</option>');
-            updateTotal();
+            alert('At least one product is required.');
         }
-    }
-
-    // Product Select Change Event
-    $(document).on('change', '.product-select', function() {
-        loadProductBatches($(this).closest('tr'));
     });
-    
-    // Batch Select Change Event (If user manually selects another batch)
-    $(document).on('change', '.batch-select', function() {
-        let row = $(this).closest('tr');
-        let selectedOption = $(this).find('option:selected');
-        
-        let availableStock = selectedOption.data('available-stock') || 0;
-        let unitPrice = selectedOption.data('unit-price') || 0.00;
-
-        row.find('.stock-available').val(availableStock);
-        row.find('.price-input').val(unitPrice.toFixed(2));
-
-        row.find('.quantity-input').prop('disabled', false).val(1);
-        row.find('.quantity-input').trigger('input'); 
-    });
-
-
-    // ----------------------------------------------------
-    // Calculation Logic
-    // ----------------------------------------------------
-
-    // Quantity / Price change
-    $(document).on('input', '.quantity-input, .price-input', function() {
-        let row = $(this).closest('tr');
-        let quantity = parseFloat(row.find('.quantity-input').val()) || 0;
-        let price = parseFloat(row.find('.price-input').val()) || 0;
-        let subTotal = quantity * price;
-        let availableStock = parseFloat(row.find('.stock-available').val()) || 0;
-
-        // Stock Validation (if Quantity > Available Stock)
-        if (quantity > availableStock) {
-            alert(`Quantity cannot exceed available stock (${availableStock}).`);
-            row.find('.quantity-input').val(availableStock);
-            quantity = availableStock;
-            subTotal = quantity * price;
-        }
-
-        row.find('.sub-total').val(subTotal.toFixed(2));
-        updateTotal();
-    });
-
-    // Grand total
-    function updateTotal() {
-        let grandTotal = 0;
-        $('.sub-total').each(function() {
-            grandTotal += parseFloat($(this).val()) || 0;
-        });
-        $('#grand_total').val(grandTotal.toFixed(2));
-    }
-
-
-    // ----------------------------------------------------
-    // Row Management
-    // ----------------------------------------------------
-    
-    // Add new row
-    $('#add-row').click(function() {
-        let newRow = $(`
-            <tr>
-                <td>
-                    <select name="items[${row_count}][product_id]" class="form-control product-select" required>
-                        <option value="">Select Product</option>
-                        @foreach($products as $product)
-                            <option value="{{ $product->id }}">{{ $product->name }}</option>
-                        @endforeach
-                    </select>
-                </td>
-                <td>
-                    <select name="items[${row_count}][product_stock_id]" class="form-control batch-select" required disabled>
-                        <option value="">Select Product First</option>
-                    </select>
-                </td>
-                <td>
-                    <input type="text" class="form-control stock-available" readonly value="0">
-                </td>
-                <td>
-                    <input type="number" name="items[${row_count}][quantity]" class="form-control quantity-input" min="1" required disabled value="1">
-                </td>
-                <td>
-                    <input type="number" name="items[${row_count}][unit_price]" class="form-control price-input" step="0.01" min="0" required value="0.00">
-                </td>
-                <td>
-                    <input type="text" name="items[${row_count}][sub_total]" class="form-control sub-total" readonly value="0.00">
-                </td>
-                <td>
-                    <button type="button" class="btn btn-danger btn-sm remove-row"><i class="fas fa-trash"></i> Remove</button>
-                </td>
-            </tr>
-        `);
-        $('#product_table tbody').append(newRow);
-        row_count++;
-    });
-
-    // Remove row
-    $(document).on('click', '.remove-row', function() {
-        $(this).closest('tr').remove();
-        updateTotal();
-    });
-
-    updateTotal(); 
 });
+
+function addItemRow() {
+    let newRow = $('#item-row-template').clone();
+    let rowHtml = newRow.html().replace(/__INDEX__/g, itemIndex);
+    newRow.html(rowHtml);
+    newRow.removeAttr('id').show();
+    $('#item-table-body').append(newRow);
+    updateGrandTotal();
+    itemIndex++;
+}
+
+function updateRowSubtotal(row) {
+    let qty = parseFloat(row.find('.quantity').val()) || 0;
+    let price = parseFloat(row.find('.unit-price').val()) || 0;
+    let subtotal = qty * price;
+    row.find('.subtotal-text').text(subtotal.toFixed(2));
+}
+
+function updateGrandTotal() {
+    let grandTotal = 0;
+    $('#item-table-body tr').each(function() {
+        let subtotal = parseFloat($(this).find('.subtotal-text').text()) || 0;
+        grandTotal += subtotal;
+    });
+    $('#grand_total').val(grandTotal.toFixed(2));
+}
 </script>
-@endpush
+@endsection

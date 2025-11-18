@@ -3,8 +3,8 @@
 @section('content')
 <div class="container-fluid">
     <div class="d-flex justify-content-between mb-3">
-        <h3>Product Receive List</h3>
-        <a href="{{ route('superadmin.product-receives.create') }}" class="btn btn-primary">+ New Receive</a>
+        <h3>Sales Invoice List</h3>
+        <a href="{{ route('superadmin.sales.create') }}" class="btn btn-primary">+ New Invoice</a>
     </div>
 
     @if(session('success'))
@@ -16,32 +16,48 @@
             <table class="table table-bordered table-striped table-sm">
                 <thead>
                     <tr>
-                        <th>Receive No</th>
+                        <th>Invoice No</th>
                         <th>Date</th>
-                        <th>Receiver</th>
-                        <th>Received By</th>
-                        <th>Total Qty</th>
-                        <th>Total Cost</th>
+                        <th>Depo</th>
+                        <th>Total Amount</th>
+                        <th>Status</th>
+                        <th>Created By</th>
                         <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($productReceives as $receive)
+                    @forelse($invoices as $invoice)
                         <tr>
-                            <td>{{ $receive->receive_no }}</td>
-                            <td>{{ $receive->receive_date }}</td>
-                            <td>{{ $receive->receiver->name ?? 'N/A' }}</td>
-                            <td>{{ $receive->receivedBy->name ?? 'N/A' }}</td>
-                            <td>{{ $receive->total_received_qty }}</td>
-                            <td>{{ number_format($receive->total_cost ?? 0, 2) }}</td>
+                            <td>{{ $invoice->invoice_no }}</td>
+                            <td>{{ \Carbon\Carbon::parse($invoice->invoice_date)->format('d-M-Y') }}</td>
+                            <td>{{ $invoice->depo->name ?? 'N/A' }}</td>
+                            <td>{{ number_format($invoice->total_amount, 2) }}</td>
                             <td>
-                                <a href="{{ route('superadmin.product-receives.show', $receive->id) }}" class="btn btn-sm btn-info">View</a>
+                                @php
+                                    $statusClass = [
+                                        'Pending' => 'badge bg-warning text-dark',
+                                        'Approved' => 'badge bg-success',
+                                        'Canceled' => 'badge bg-danger',
+                                    ][$invoice->status] ?? 'badge bg-secondary';
+                                @endphp
+                                <span class="{{ $statusClass }}">{{ $invoice->status }}</span>
+                            </td>
+                            <td>{{ $invoice->creator->name ?? 'N/A' }}</td>
+                            <td>
+                                <a href="{{ route('superadmin.sales.show', $invoice->id) }}" class="btn btn-sm btn-info">View</a>
                             </td>
                         </tr>
-                    @endforeach
+                    @empty
+                        <tr>
+                            <td colspan="7" class="text-center">No sales invoices found.</td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
-            <div class="mt-2">{{ $productReceives->links() }}</div>
+
+            <div class="mt-2">
+                {{ $invoices->links() }}
+            </div>
         </div>
     </div>
 </div>

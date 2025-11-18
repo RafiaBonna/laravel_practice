@@ -90,7 +90,9 @@ Route::prefix('sales')->name('superadmin.sales.')->group(function () {
     Route::get('/create', [SalesInvoiceController::class, 'create'])->name('create'); 
     
     // Store Invoice (POST: /superadmin/sales)
-    Route::post('/', [SalesInvoiceController::class, 'store'])->name('store');       
+    Route::post('/', [SalesInvoiceController::class, 'store'])->name('store');    
+    Route::get('/{id}', [SalesInvoiceController::class, 'show'])->name('show');
+   
 
     // API: Load Product Stock Batches (GET: /superadmin/sales/api/product-stock/batches/{productId})
     Route::get('/api/product-stock/batches/{productId}', [SalesInvoiceController::class, 'getProductBatches'])->name('api.product-stock.batches');

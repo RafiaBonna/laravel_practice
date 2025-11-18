@@ -8,6 +8,7 @@ use App\Models\ProductReceive;
 use App\Models\ProductReceiveItem;
 use App\Models\ProductStock;
 use App\Models\User;
+use App\Models\Supplier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -128,5 +129,13 @@ class ProductReceiveController extends Controller
                 ->withInput()
                 ->with('error', 'Failed to save Product Receive Entry. Please check the logs.');
         }
+    }
+    public function show($id)
+    {
+        // Find the record along with its associated items and the involved users (receiver/receivedBy)
+        $productReceive = ProductReceive::with('items.product', 'receiver', 'receivedBy')
+            ->findOrFail($id);
+
+        return view('superadmin.product_receives.show', compact('productReceive'));
     }
 }

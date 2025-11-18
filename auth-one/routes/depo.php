@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Depo\DepoDashboardController;
 use App\Http\Controllers\Depo\SalesApprovalController;
+// 🆕 নতুন কন্ট্রোলারটি যোগ করুন
+use App\Http\Controllers\Depo\DistributorController; 
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('depo')->group(function () {
@@ -24,7 +26,20 @@ Route::prefix('depo')->group(function () {
             // Cancellation Action (no stock deduction)
             Route::post('/{salesInvoice}/cancel', 'cancel')->name('cancel');
         });
-
+        
+        // 🆕 DISTRIBUTOR MANAGEMENT MODULE (Uses depo.users.* names)
+        // এই Route Resource টি depo.users.index, .create, .store ইত্যাদি নাম তৈরি করবে।
+        Route::resource('distributors', DistributorController::class)
+            ->names([
+                'index'   => 'depo.users.index',   // সাইডবার এই রুটটি কল করছে
+                'create'  => 'depo.users.create',
+                'store'   => 'depo.users.store',
+                'show'    => 'depo.users.show',
+                'edit'    => 'depo.users.edit',
+                'update'  => 'depo.users.update',
+                'destroy' => 'depo.users.destroy',
+            ])
+            ->parameters(['distributors' => 'distributor']); // URL-এ parameter হিসেবে 'distributor' ব্যবহার করবে
 
     });
 });

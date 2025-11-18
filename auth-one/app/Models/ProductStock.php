@@ -7,6 +7,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany; // <--- এটি যোগ করা হয়েছে
 
 class ProductStock extends Model
 {
@@ -16,7 +17,7 @@ class ProductStock extends Model
         'product_id',
         'batch_no',
         'expiry_date',
-        'available_quantity',
+        'available_quantity', // ⚠️ আপনার ফিল্ডটি 'available_quantity' হলে এখানে সেই নামটি ব্যবহার করা হয়েছে
     ];
 
     /**
@@ -25,5 +26,14 @@ class ProductStock extends Model
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
+    }
+
+    /**
+     * এই স্টক থেকে যে ইনভয়েস আইটেমগুলো তৈরি হয়েছে (Stock Out Traceability).
+     * ⚠️ SalesInvoiceItem মডেলে foreign key হিসেবে 'product_stock_id' ব্যবহার করা হয়েছে।
+     */
+    public function salesItems(): HasMany 
+    {
+        return $this->hasMany(SalesInvoiceItem::class, 'product_stock_id');
     }
 }

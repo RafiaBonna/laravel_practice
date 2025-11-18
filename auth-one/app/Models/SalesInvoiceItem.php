@@ -8,33 +8,43 @@ use Illuminate\Database\Eloquent\Model;
 class SalesInvoiceItem extends Model
 {
     use HasFactory;
-
-    // ১. Fillable properties
+    
+    // আপনি মাইগ্রেশনে product_stock_id field যোগ করেছেন
+    public $timestamps = false; // সাধারণত আইটেম টেবিলে timestamps লাগে না
+    
     protected $fillable = [
         'sales_invoice_id',
         'product_id',
-        'product_stock_id', 
+        'product_stock_id', // ⚠️ কেন্দ্রীয় স্টকের ব্যাচ ID
         'quantity',
         'unit_price',
         'sub_total',
     ];
 
-    // ২. Invoice (কোন ইনভয়েসের অংশ)
-    public function invoice()
+    protected $casts = [
+        'unit_price' => 'decimal:2',
+        'sub_total' => 'decimal:2',
+    ];
+
+    // রিলেশনশিপস
+
+    // যে ইনভয়েসের অংশ
+    public function salesInvoice()
     {
         return $this->belongsTo(SalesInvoice::class);
     }
 
-    // ৩. Product (কোন পণ্য বিক্রি হলো)
+    // পণ্য
     public function product()
     {
-        return $this->belongsTo(Product::class); // Product মডেল আপনার থাকতে হবে
+        // ⚠️ ধরে নেওয়া হচ্ছে 'Product' মডেল আছে
+        return $this->belongsTo(Product::class);
     }
-
-    // ৪. Stock (কোন স্টক/ব্যাচ থেকে বিক্রি হলো)
+    
+    // যে ব্যাচ/স্টক থেকে বিক্রি হয়েছে
     public function stock()
     {
-        // ধরে নিলাম আপনার ProductStock নামে একটি মডেল আছে
-        return $this->belongsTo(ProductStock::class, 'product_stock_id'); 
+        // ⚠️ স্টক আউট করার জন্য এই রিলেশনশিপটি খুব গুরুত্বপূর্ণ
+        return $this->belongsTo(ProductStock::class, 'product_stock_id');
     }
 }
