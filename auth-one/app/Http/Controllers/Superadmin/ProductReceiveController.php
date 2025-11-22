@@ -16,10 +16,13 @@ class ProductReceiveController extends Controller
 {
     public function index()
     {
+        // Fetch the product receives list
         $productReceives = ProductReceive::with('receiver', 'receivedBy')
             ->orderBy('id', 'desc')
             ->paginate(10);
 
+        // --- CORRECTION MADE HERE ---
+        // Changed 'invoices' to 'productReceives' to match the variable name defined above.
         return view('superadmin.product_receives.index', compact('productReceives'));
     }
 

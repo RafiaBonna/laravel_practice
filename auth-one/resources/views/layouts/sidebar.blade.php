@@ -1,9 +1,9 @@
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
     {{-- Brand Logo --}}
     <a href="{{ route('dashboard') }}" class="brand-link text-center">
-        <img src="{{ asset('admin/dist/img/AdminLTELogo.png') }}" alt="SCM Logo"
+        <img src="{{ asset('admin/dist/img/scm2.png') }}" alt="SCM Logo"
              class="brand-image img-circle elevation-3" style="opacity:.9; background:white;">
-        <span class="brand-text font-weight-bold text-uppercase">SCM Panel</span>
+        <span class="brand-text font-weight-bold text-uppercase">Control Panel</span>
     </a>
 
     {{-- Sidebar --}}
@@ -27,7 +27,7 @@
         <nav>
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
 
-                {{-- Dashboard --}}
+                {{-- Dashboard (Functional) --}}
                 <li class="nav-item mb-1">
                     <a href="{{ route(Auth::user()->getPrimaryRole() . '.dashboard') }}"
                        class="nav-link {{ request()->routeIs(Auth::user()->getPrimaryRole() . '.dashboard') ? 'active' : '' }}">
@@ -35,10 +35,30 @@
                         <p>Dashboard</p>
                     </a>
                 </li>
+                
+                {{-- ================= Depo/Distributor Transaction (ROLE SPECIFIC BLOCKS) ================= --}}
 
-                {{-- ================= Superadmin Section ================= --}}
+                @if (Auth::user()->hasRole('depo'))
+                    {{-- Depo Transaction: STATIC PLACEHOLDER (Role Specific) --}}
+                    <li class="nav-item mb-1 mt-3">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-exchange-alt"></i>
+                            <p>Depo Transaction</p>
+                        </a>
+                    </li>
+                @elseif (Auth::user()->hasRole('distributor'))
+                    {{-- Distributor Transaction: STATIC PLACEHOLDER (Role Specific) --}}
+                    <li class="nav-item mb-1 mt-3">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-truck-loading"></i>
+                            <p>Distributor Transaction</p>
+                        </a>
+                    </li>
+                @endif
+                
+                {{-- ================= Superadmin Section (Existing Functional Blocks) ================= --}}
                 @if (Auth::user()->hasRole('superadmin'))
-                    {{-- Administration/User Management --}}
+                    {{-- Administration/User Management (Functional) --}}
                     <li class="nav-item mb-1 mt-3">
                         <a href="{{ route('superadmin.users.index') }}"
                            class="nav-link {{ request()->routeIs('superadmin.users.*') ? 'active' : '' }}">
@@ -47,7 +67,7 @@
                         </a>
                     </li>
 
-                    {{-- Raw Material Section (Treeview) --}}
+                    {{-- Raw Material Section (Treeview) (Functional) --}}
                     <?php
                         $rawMaterialRoutes = [
                             'superadmin.raw-materials.*',
@@ -109,7 +129,7 @@
                         </ul>
                     </li>
 
-                    {{-- PRODUCT MANAGEMENT (UPDATED BLOCK WITH SALES) --}}
+                    {{-- PRODUCT MANAGEMENT (UPDATED BLOCK WITH SALES) (Functional) --}}
                     <?php
                         $productRoutes = [
                             'superadmin.products.*',
@@ -138,7 +158,7 @@
                                 <a href="{{ route('superadmin.product-receives.index') }}" class="nav-link {{ request()->routeIs('superadmin.product-receives.*') ? 'active' : '' }}">
                                     <i class="far fa-circle nav-icon"></i>
                                     <p>Product Receive (In)</p>
-                                </a>
+                                </p>
                             </li>
 
                             {{-- 3. SALES MANAGEMENT --}}
@@ -166,14 +186,14 @@
                                 </ul>
                             </li>
 
-                            {{-- 4. Product Return --}}
+                            {{-- 4. Product Return (Static) --}}
                             <li class="nav-item">
                                 <a href="#" class="nav-link {{ request()->routeIs('superadmin.product-returns.*') ? 'active' : '' }}">
                                     <i class="far fa-circle nav-icon"></i>
                                     <p>Product Return List</p>
                                 </a>
                             </li>
-                            {{-- 5. Product Wastage --}}
+                            {{-- 5. Product Wastage (Static) --}}
                             <li class="nav-item">
                                 <a href="#" class="nav-link {{ request()->routeIs('superadmin.product-wastage.*') ? 'active' : '' }}">
                                     <i class="far fa-circle nav-icon"></i>
@@ -182,8 +202,60 @@
                             </li>
                         </ul>
                     </li>
+                @endif
+                
+                {{-- ================= Depo Section (Existing Functional Blocks) ================= --}}
+                @if (Auth::user()->hasRole('depo'))
+                    {{-- Sales Approval Menu (Product Receive) (Functional) --}}
+                    <?php
+                        $invoiceRoutes = ['depo.invoices.*'];
+                        $isInvoiceActive = in_array(true, array_map(fn($route) => request()->routeIs($route), $invoiceRoutes));
+                    ?>
+                    <li class="nav-item {{ $isInvoiceActive ? 'menu-open' : '' }} mt-3">
+                        <a href="#" class="nav-link {{ $isInvoiceActive ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-file-invoice-dollar"></i>
+                            <p>Product receive <i class="right fas fa-angle-left"></i></p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="{{ route('depo.invoices.pending') }}" class="nav-link {{ request()->routeIs('depo.invoices.pending') ? 'active' : '' }}">
+                                    <i class="far fa-circle nav-icon text-warning"></i>
+                                    <p>Pending for Approval</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('depo.invoices.index') }}" class="nav-link {{ request()->routeIs('depo.invoices.index') ? 'active' : '' }}">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>All Invoices</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
 
-                    {{-- Settings Section (Treeview) --}}
+                    {{-- Distributor Management (Functional) --}}
+                    <li class="nav-item mb-1 mt-3">
+                        <a href="{{ route('depo.users.index') }}"
+                           class="nav-link {{ request()->routeIs('depo.users.*') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-users"></i>
+                            <p>Distributor Management</p>
+                        </a>
+                    </li>
+                @endif
+
+                {{-- ================= Distributor Section (Existing Functional Blocks) ================= --}}
+                @if (Auth::user()->hasRole('distributor'))
+                    {{-- Customer List (Static) --}}
+                    <li class="nav-item mb-1 mt-3">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-user-friends"></i>
+                            <p>Customer List</p>
+                        </a>
+                    </li>
+                @endif
+                
+                {{-- ================= Functional Settings for Superadmin ================= --}}
+                @if (Auth::user()->hasRole('superadmin'))
+                    {{-- Settings Section (Treeview) (Functional) --}}
                     <?php
                         $settingsRoutes = ['superadmin.suppliers.*', 'superadmin.depo.index', 'superadmin.distributor.*'];
                         $isSettingsActive = in_array(true, array_map(fn($route) => request()->routeIs($route), $settingsRoutes));
@@ -218,64 +290,42 @@
                     </li>
                 @endif
 
-                {{-- ================= Depo Section ================= --}}
-                @if (Auth::user()->hasRole('depo'))
-                    {{-- Sales Approval Menu --}}
-                    <?php
-                        $invoiceRoutes = ['depo.invoices.*'];
-                        $isInvoiceActive = in_array(true, array_map(fn($route) => request()->routeIs($route), $invoiceRoutes));
-                    ?>
-                    <li class="nav-item {{ $isInvoiceActive ? 'menu-open' : '' }} mt-3">
-                        <a href="#" class="nav-link {{ $isInvoiceActive ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-file-invoice-dollar"></i>
-                            <p>Warehouse Invoices <i class="right fas fa-angle-left"></i></p>
-                        </a>
-                        <ul class="nav nav-treeview">
-                            <li class="nav-item">
-                                <a href="{{ route('depo.invoices.pending') }}" class="nav-link {{ request()->routeIs('depo.invoices.pending') ? 'active' : '' }}">
-                                    <i class="far fa-circle nav-icon text-warning"></i>
-                                    <p>Pending for Approval</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('depo.invoices.index') }}" class="nav-link {{ request()->routeIs('depo.invoices.index') ? 'active' : '' }}">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>All Invoices</p>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
+                {{-- ================= STATIC PLACEHOLDER MENUS (MOVED TO THE BOTTOM) ================= --}}
+                
+                {{-- Sales Report (STATIC PLACEHOLDER) --}}
+                <li class="nav-item mb-1 mt-3">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-chart-line"></i>
+                        <p>Sales Report</p>
+                    </a>
+                </li>
+                
+                {{-- NEW FEATURE: Target (STATIC PLACEHOLDER) --}}
+                <li class="nav-item mb-1">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-bullseye"></i>
+                        <p>Target</p>
+                    </a>
+                </li>
 
-                    <li class="nav-item mb-1 mt-3">
-                        <a href="{{ route('depo.users.index') }}"
-                           class="nav-link {{ request()->routeIs('depo.users.*') ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-users"></i>
-                            <p>Distributor Management</p>
-                        </a>
-                    </li>
-                @endif
+                {{-- Expense (STATIC PLACEHOLDER) --}}
+                <li class="nav-item mb-1">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-money-bill-wave"></i>
+                        <p>Expense</p>
+                    </a>
+                </li>
 
-                {{-- ================= Distributor Section ================= --}}
-                @if (Auth::user()->hasRole('distributor'))
+                {{-- Settings (STATIC PLACEHOLDER for non-Superadmin roles) --}}
+                @if (!Auth::user()->hasRole('superadmin'))
                     <li class="nav-item mb-1 mt-3">
                         <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-user-friends"></i>
-                            <p>Customer List</p>
+                            <i class="nav-icon fas fa-cog"></i>
+                            <p>Settings</p>
                         </a>
                     </li>
                 @endif
-
-                {{-- ================= Logout ================= --}}
-                <li class="nav-item mt-4">
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <a href="{{ route('logout') }}" class="nav-link text-danger"
-                           onclick="event.preventDefault(); this.closest('form').submit();">
-                            <i class="nav-icon fas fa-sign-out-alt"></i>
-                            <p>Logout</p>
-                        </a>
-                    </form>
-                </li>
+                
             </ul>
         </nav>
     </div>
