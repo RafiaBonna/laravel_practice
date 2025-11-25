@@ -10,6 +10,7 @@
     <h3>This is new 3</h3>
     <h4>This is new 4</h4>
     <h6>This is new 4</h6>
+    <h7>This is new 4</h7>
     <h5>This is new 4</h5>
 </body>
 </html>
