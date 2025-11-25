@@ -7,8 +7,7 @@
 </head>
 <body>
     <h2>This is my home page</h2>
-    <h3>This is new 3</h3>
-    <h4>This is new 4</h4>
+   
     
 </body>
 </html>
