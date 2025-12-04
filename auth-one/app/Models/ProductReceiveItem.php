@@ -9,29 +9,21 @@ class ProductReceiveItem extends Model
 {
     use HasFactory;
 
+    protected $table = 'product_receive_items';
+
     protected $fillable = [
         'product_receive_id',
         'product_id',
         'batch_no',
         'production_date',
         'expiry_date',
-        'received_quantity', // The column name used in the store method (Fixed)
+        'received_quantity',
         'cost_rate',
         'mrp',
         'retail',
         'distributor',
         'depo_selling',
-        'total_item_cost', // The cost calculated in the store method (Fixed)
-    ];
-
-    protected $casts = [
-        'received_quantity' => 'float',
-        'cost_rate' => 'float',
-        'mrp' => 'float',
-        'retail' => 'float',
-        'distributor' => 'float',
-        'depo_selling' => 'float',
-        'total_item_cost' => 'float',
+        'total_item_cost',
     ];
 
     public function receive()
@@ -41,6 +33,6 @@ class ProductReceiveItem extends Model
 
     public function product()
     {
-        return $this->belongsTo(Product::class, 'product_id');
+        return $this->belongsTo(\App\Models\Product::class, 'product_id');
     }
 }

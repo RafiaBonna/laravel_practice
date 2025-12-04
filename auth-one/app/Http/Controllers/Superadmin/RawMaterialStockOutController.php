@@ -131,7 +131,7 @@ class RawMaterialStockOutController extends Controller
 
             DB::commit();
             return redirect()->route('superadmin.raw-material-stock-out.index')
-                             ->with('success', 'কাঁচামাল ইস্যু সফলভাবে সংরক্ষণ করা হয়েছে!');
+                             ->with('success', 'Raw Material stock out Successfully!');
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->withInput()->with('error', 'Error: ' . $e->getMessage());
