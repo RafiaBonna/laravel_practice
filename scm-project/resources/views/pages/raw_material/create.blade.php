@@ -27,7 +27,7 @@
                             
                             {{-- Unit Field --}}
                             <div class="form-group">
-                                <label for="unit">Unit of Measure (e.g., pcs, kg, meter)</label>
+                                <label for="unit">Unit of Measures (e.g., pcs, kg, meter)</label>
                                 <input type="text" name="unit" id="unit" class="form-control @error('unit') is-invalid @enderror" value="{{ old('unit', 'pcs') }}" required maxlength="50">
                                 @error('unit') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
