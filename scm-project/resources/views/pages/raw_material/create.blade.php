@@ -34,7 +34,7 @@
                             
                             {{-- Alert Stock Field --}}
                             <div class="form-group">
-                                <label for="alert_stock">Alert Stock Quantity</label>
+                                <label for="alert_stock">Alert Stock Quantity :</label>
                                 <input 
                                     type="number" 
                                     name="alert_stock" 
