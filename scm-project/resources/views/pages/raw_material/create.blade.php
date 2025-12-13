@@ -20,7 +20,7 @@
                             
                             {{-- Name Field --}}
                             <div class="form-group">
-                                <label for="name">Material Name</label>
+                                <label for="name">Material Name :</label>
                                 <input type="text" name="name" id="name" class="form-control @error('name') is-invalid @enderror" value="{{ old('name') }}" required autofocus>
                                 @error('name') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
